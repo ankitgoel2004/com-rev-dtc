@@ -1,3 +1,7 @@
 streamlit
 PyYAML
 plotly
+matplotlib
+pandas
+numpy
+scipy
