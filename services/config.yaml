@@ -1,0 +1,31 @@
+# config.yaml
+app:
+  title: "🚢 Cruise Ship Metrics Dashboard"
+  description: "Compare performance metrics across different ships and sailings"
+  color_palette: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd","#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+  metric_categories:
+    Ship Experience: ["Holiday and Ship Experience"]
+    Cabins: ["Cabins", "Cabin Cleanliness"]
+    Food & Beverage: ["F&B Quality Overall", "F&B Service Overall", "F&B Quality Main Dining"]
+    Services: ["Crew Friendliness", "Prior Customer Care", "Sentiment Analysis"]
+    Activities: ["Entertainment", "Excursions"]
+    Other Metrics: ["App Booking", "Flight", "Hotel Accommodation"]
+
+metrics:
+  attributes: ['Ship overall', 'Ship rooms', 'F&B quality overall',
+       'F&B service overall', 'F&B quality main dining', 'Entertainment',
+       'Excursions', 'drinks offerings', 'bar service', 'cabin cleanliness',
+       'crew friendliness', 'Sentiment analysis', 'Primary issues mentioned',
+       'Review']
+
+api:
+  base_url: "http://localhost:5000/sailing"
+  timeout: 10
+  endpoints:
+    auth: "auth"
+    get_ships: "ships"
+    get_ratings: "getRatingSmry"
+    get_metric_ratings: "getMetricRating"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"

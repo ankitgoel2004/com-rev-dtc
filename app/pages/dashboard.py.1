@@ -1,0 +1,59 @@
+import streamlit as st
+from ..utils import get_client
+
+def show():
+    """Main dashboard overview page"""
+    client = get_client()
+    
+    st.title("🌊 Cruise Analytics Dashboard")
+    
+    # Overview metrics
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Ships", len(client.get_available_ships()))
+    with col2:
+        st.metric("Avg Rating", "8.2", "+0.3 from last month")
+    with col3:
+        st.metric("Active Sailings", "24")
+    
+    # Recent alerts section
+    with st.expander("🚨 Recent Alerts", expanded=True):
+        st.info("🔍 Voyager CR348: 12 new reviews below threshold")
+        st.warning("⚠️ Explorer: Cabin cleanliness rating dropped 15%")
+        st.success("✅ Discovery 2: Sentiment improved 22%")
+    
+    # Quick access sections
+    tab1, tab2 = st.tabs(["Recent Ratings", "Priority Metrics"])
+    
+    with tab1:
+        st.subheader("Recent Ship Ratings")
+        # Placeholder data - replace with actual API call
+        recent_data = {
+            "Ship": ["Voyager", "Explorer", "Discovery"],
+            "Rating": [8.7, 7.9, 9.1],
+            "Trend": ["↑", "↓", "→"]
+        }
+        st.dataframe(recent_data, hide_index=True)
+    
+    with tab2:
+        st.subheader("Metrics Needing Attention")
+        # Placeholder data
+        metrics_data = {
+            "Metric": ["Cabin Cleanliness", "F&B Quality", "Entertainment"],
+            "Score": [6.2, 7.1, 6.8],
+            "Target": [8.0, 8.5, 7.5],
+            "Status": ["Needs Improvement", "Watch", "Below Target"]
+        }
+        st.dataframe(metrics_data, hide_index=True)
+    
+    # Add quick navigation buttons
+    st.divider()
+    cols = st.columns(2)
+    with cols[0]:
+        if st.button("📊 Go to Ratings Analysis", use_container_width=True):
+            st.session_state.current_page = "Ratings Summary"
+            st.rerun()
+    with cols[1]:
+        if st.button("📈 Go to Metric Comparison", use_container_width=True):
+            st.session_state.current_page = "Metric Comparison"
+            st.rerun()
