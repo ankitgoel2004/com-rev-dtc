@@ -19,7 +19,7 @@ metrics:
        'Review']
 
 api:
-  base_url: "http://localhost:5000/sailing"
+  base_url: "http://13.126.187.166:5000/sailing"
   timeout: 10
   endpoints:
     auth: "auth"
