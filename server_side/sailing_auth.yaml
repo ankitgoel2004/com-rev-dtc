@@ -1,7 +1,0 @@
-users:
-  admin:
-    password: pbkdf2:sha256:600000$nGSu16Ak97mSq0SQ$23ab60c256bb6882da3210383af4bcbcc45e4c73d9a6780ef13c734e819a9e20
-    role: admin
-  jayne:
-    password: pbkdf2:sha256:1000000$mR5N9KQyr9q1Yzfo$d6213d529f0ed01787823b42fc1f6da8e768999e4a9b6bdb13d4c5bb8fa3d093
-    role: admin
