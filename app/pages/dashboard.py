@@ -68,7 +68,7 @@ def display_overview_metrics(summaries: List[Dict]):
     cols = st.columns(len(metrics))
     for idx, (display_name, api_name) in enumerate(metrics):
         with cols[idx]:
-            values = [s.get(display_name, 0) for s in summaries if display_name in s]
+            values = [s.get(display_name.lower(), 0) for s in summaries if display_name.lower() in {k.lower() for k in s}]
             avg = sum(values) / len(values) if values else 0
             delta = avg - 8.0  # Compare to benchmark of 8.0
             st.metric(
