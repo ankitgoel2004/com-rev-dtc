@@ -5,8 +5,8 @@ app:
   color_palette: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd","#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
   metric_categories:
     Ship Experience: ["Holiday and Ship Experience"]
-    Cabins: ["Cabins", "Cabin Cleanliness"]
-    Food & Beverage: ["F&B Quality Overall", "F&B Service Overall", "F&B Quality Main Dining"]
+    Cabins: ["Cabins", "cabin cleanliness"]
+    Food & Beverage: ["F&B quality overall", "F&B staff service overall", "F&B quality main dining"]
     Services: ["Crew Friendliness", "Prior Customer Care", "Sentiment Analysis"]
     Activities: ["Entertainment", "Excursions"]
     Other Metrics: ["App Booking", "Flight", "Pre-Cruise Hotel Accommodation"]
