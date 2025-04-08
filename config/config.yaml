@@ -13,9 +13,9 @@ app:
 
 metrics:
   attributes: ['Ship overall', 'Ship rooms', 'F&B quality overall',
-       'F&B service overall', 'F&B quality main dining', 'Entertainment',
+       'F&B staff service overall', 'F&B quality main dining', 'Entertainment',
        'Excursions', 'drinks offerings', 'bar service', 'cabin cleanliness',
-       'crew friendliness', 'Sentiment analysis', 'Primary issues mentioned',
+       'crew friendliness', 'Sentiment analysis', 'Primary issues mentioned', 'Prior Customer Care', 'Pre-Cruise Hotel Accomodation',
        'Review']
 
 api:
