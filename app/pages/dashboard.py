@@ -49,7 +49,7 @@ def show():
                 except Exception as e:
                     st.error(f"Failed to load dashboard data: {str(e)}")
 
-def display_overview_metrics(summaries: List[Dict]):
+def display_overview_metrics_old(summaries: List[Dict]):
     """Display key metrics in columns"""
     st.markdown("### Key Metrics")
     
@@ -76,6 +76,36 @@ def display_overview_metrics(summaries: List[Dict]):
                 value=f"{avg:.1f}",
                 delta=f"{delta:+.1f} vs benchmark"
             )
+
+def display_overview_metrics(summaries: List[Dict]):
+    """Display key metrics in columns"""
+    st.markdown("### Key Metrics")
+
+    if not summaries:
+        st.warning("No data available for the selected criteria")
+        return
+
+    # Calculate averages across all selected sailings
+    metrics = [
+        ('F&B Quality Overall', 'F&B Quality Overall'),
+        ('Cabin Cleanliness', 'cabinCleanlinessScore'),
+        ('Crew Friendliness', 'crewFriendlinessScore'),
+        ('Entertainment', 'entertainmentScore')
+    ]
+
+    cols = st.columns(len(metrics))
+    for idx, (display_name, api_name) in enumerate(metrics):
+        with cols[idx]:
+            lower_display_name = display_name.lower()
+            values = [s.get(key, 0) for s in summaries for key in s if key.lower() == lower_display_name]
+            avg = sum(values) / len(values) if values else 0
+            delta = avg - 8.0  # Compare to benchmark of 8.0
+            st.metric(
+                label=display_name,
+                value=f"{avg:.1f}",
+                delta=f"{delta:+.1f} vs benchmark"
+            )
+
 
 def display_metric_trends(summaries: List[Dict]):
     """Display metric trends over time"""
