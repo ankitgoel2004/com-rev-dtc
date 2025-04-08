@@ -60,8 +60,8 @@ def display_overview_metrics_old(summaries: List[Dict]):
     # Calculate averages across all selected sailings
     metrics = [
         ('F&B Quality Overall', 'F&B Quality Overall'),
-        ('Cabin Cleanliness', 'cabinCleanlinessScore'),
-        ('Crew Friendliness', 'crewFriendlinessScore'),
+        ('cabin cleanliness', 'cabinCleanlinessScore'),
+        ('crew friendliness', 'crewFriendlinessScore'),
         ('Entertainment', 'entertainmentScore')
     ]
     
