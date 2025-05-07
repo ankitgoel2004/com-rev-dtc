@@ -59,10 +59,10 @@ def display_overview_metrics(summaries: List[Dict]):
     
     # Calculate averages across all selected sailings
     metrics = [
-        ('F&B Quality Overall', 'F&B Quality Overall'),
-        ('Cabin Cleanliness', 'cabinCleanlinessScore'),
-        ('Crew Friendliness', 'crewFriendlinessScore'),
-        ('Entertainment', 'entertainmentScore')
+        ('F&B Quality', 'F&B Quality'),
+        ('Cabin Cleanliness', 'Cabin Cleanliness'),
+        ('Crew Friendliness', 'Crew Friendliness'),
+        ('Entertainment', 'Entertainment')
     ]
     
     cols = st.columns(len(metrics))
@@ -86,9 +86,9 @@ def display_metric_trends(summaries: List[Dict]):
     
     # Prepare data for plotting
     metrics = [
-        ('F&B Quality', 'fbQualityOverall'),
-        ('Cabin Cleanliness', 'cabinCleanlinessScore'),
-        ('Entertainment', 'entertainmentScore')
+        ('F&B Quality', 'F&B Quality'),
+        ('Cabin Cleanliness', 'Cabin Cleanliness'),
+        ('Entertainment', 'Entertainment')
     ]
     
     plot_data = []
@@ -132,13 +132,13 @@ def display_ship_comparison(summaries: List[Dict]):
     comparison_metrics = st.multiselect(
         "Select metrics to compare",
         options=[
-            'F&B Quality Overall',
+            'F&B Quality',
             'Cabin Cleanliness',
             'Crew Friendliness',
             'Entertainment',
             'Excursions'
         ],
-        default=['F&B Quality Overall',
+        default=['F&B Quality',
             'Cabin Cleanliness',
             'Crew Friendliness',
             'Entertainment',
@@ -151,7 +151,7 @@ def display_ship_comparison(summaries: List[Dict]):
     # Prepare data for radar chart
     radar_data = []
     metric_mapping = {
-        'F&B Quality Overall': 'F&B Quality Overall',
+        'F&B Quality': 'F&B Quality',
         'Cabin Cleanliness': 'Cabin Cleanliness',
         'Crew Friendliness': 'Crew Friendliness',
         'Entertainment': 'Entertainment',

@@ -4,19 +4,15 @@ app:
   description: "Compare performance metrics across different ships and sailings"
   color_palette: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd","#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
   metric_categories:
-    Ship Experience: ["Holiday and Ship Experience"]
+    Ship Experience: ["Overall Holiday", "Value for Money", "Ship Condition/Cleanliness (Public Areas)"]
     Cabins: ["Cabins", "Cabin Cleanliness"]
-    Food & Beverage: ["F&B Quality Overall", "F&B Service Overall", "F&B Quality Main Dining"]
-    Services: ["Crew Friendliness", "Prior Customer Care", "Sentiment Analysis"]
+    Food & Beverage: ['F&B Quality', 'F&B Service', 'Bar Service', 'Drinks Offerings and Menu']
+    Services: ["Crew Friendliness", "Prior Customer Service", "Sentiment Analysis"]
     Activities: ["Entertainment", "Excursions"]
-    Other Metrics: ["App Booking", "Flight", "Hotel Accommodation"]
+    Other Metrics: ["App Booking", "Flight", "Pre-Cruise Hotel Accomodation", "Embarkation/Disembarkation"]
 
 metrics:
-  attributes: ['Ship overall', 'Ship rooms', 'F&B quality overall',
-       'F&B service overall', 'F&B quality main dining', 'Entertainment',
-       'Excursions', 'drinks offerings', 'bar service', 'cabin cleanliness',
-       'crew friendliness', 'Sentiment analysis', 'Primary issues mentioned',
-       'Review']
+  attributes: ['Overall Holiday', 'Prior Customer Service', 'Flight', 'Embarkation/Disembarkation', 'Value for Money', 'App Booking', 'Pre-Cruise Hotel Accomodation', 'Cabins', 'Cabin Cleanliness', 'F&B Quality', 'F&B Service', 'Bar Service', 'Drinks Offerings and Menu', 'Entertainment', 'Excursions', 'Crew Friendliness', 'Ship Condition/Cleanliness (Public Areas)', 'Sentiment Score']
 
 api:
   base_url: "http://13.126.187.166:5000/sailing"
