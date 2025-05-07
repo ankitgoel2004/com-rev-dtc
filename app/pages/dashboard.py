@@ -96,7 +96,7 @@ def display_metric_trends(summaries: List[Dict]):
         for display_name, api_name in metrics:
             if display_name in summary:
                 plot_data.append({
-                    'Date': summary.get('sailingDate', 'N/A'),
+                    'Date': summary.get('sailingDate', '2023-01-01'),
                     'Ship': summary.get('Ship Name', 'Unknown'),
                     'Metric': display_name,
                     'Score': summary[display_name]
