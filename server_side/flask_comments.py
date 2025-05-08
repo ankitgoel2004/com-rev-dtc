@@ -100,25 +100,52 @@ def remove_server_header(response):
 def get_rating_summary():
     """Endpoint for getting full rating summaries"""
     data = request.get_json()
-    
-    # Validate input
-    if not data or "sailings" not in data:
-        return jsonify({"error": "Missing sailings parameter"}), 400
-    
-    # Get requested sailings
-    results = find_sailings(data["sailings"])
 
-    # Apply date filters if provided
-    if "filters" in data:
-        if "fromDate" in data["filters"]:
-            pass  # In a real API, you would filter by date here
-        if "toDate" in data["filters"]:
-            pass
-    print(results)
+    # Validate input
+    if not data or ("sailings" not in data and "filters" not in data):
+        return jsonify({"error": "Missing sailings or filters parameter"}), 400
+
+    filter_by = data.get("filterBy", "sailing")
+
+    results = []
+
+    if filter_by == "sailing":
+        # Get requested sailings if provided
+        if "sailings" in data:
+            results = find_sailings(data["sailings"])
+        else:
+            return jsonify({"error": "Sailings must be provided when filtering by sailing"}), 400
+
+    elif filter_by == "date":
+        # Apply date filters if provided
+        if "filters" in data:
+            from_date = data["filters"].get("fromDate")
+            to_date = data["filters"].get("toDate")
+
+            if not from_date or not to_date:
+                return jsonify({"error": "Both fromDate and toDate must be provided when filtering by date"}), 400
+
+            from_date = pd.to_datetime(from_date)
+            to_date = pd.to_datetime(to_date)
+
+            # Filter SAMPLE_DATA by date range
+            results = [
+                item for item in SAMPLE_DATA
+                if pd.to_datetime(item["Start"]) >= from_date and pd.to_datetime(item["End"]) <= to_date
+            ]
+        else:
+            return jsonify({"error": "Filters must be provided when filtering by date"}), 400
+
+    else:
+        return jsonify({"error": "Invalid filterBy value. Must be 'sailing' or 'date'"}), 400
+
+    # Remove duplicates if both sailings and date filters are applied
+    results = {frozenset(item.items()): item for item in results}.values()
+
     return jsonify({
         "status": "success",
         "count": len(results),
-        "data": results
+        "data": list(results)
     })
 
 @app.route('/sailing/getMetricRating', methods=['POST'])

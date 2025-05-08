@@ -7,47 +7,70 @@ import plotly.express as px
 
 def show():
     st.title("🚢 Cruise Analytics Dashboard")
-    
+
     # Initialize API client
     client = get_client()
-    
+
     with st.container():
         st.markdown("### Overview of Cruise Performance Metrics")
-        
-        # Date range selection
-        col1, col2 = st.columns(2)
-        with col1:
-            date_from = st.date_input("From Date")
-        with col2:
-            date_to = st.date_input("To Date")
-        
-        # Ship selection
-        selected_ships = display_ship_selector(multi=True)
-        
-        if not selected_ships:
-            st.warning("Please select at least one ship")
-            return
-            
-        if st.button("Load Dashboard Data"):
-            with st.spinner("Loading dashboard data..."):
-                try:
-                    # Convert to SailingIdentifiers (assuming sailing number 1 for dashboard)
-                    sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
-                    
-                    # Get rating summaries for selected ships
-                    summaries = client.get_rating_summary(
-                        sailings=sailings,
-                        from_date=date_from.isoformat(),
-                        to_date=date_to.isoformat()
-                    )
-                    print(summaries)
-                    # Display the dashboard components
-                    display_overview_metrics(summaries)
-                    display_metric_trends(summaries)
-                    display_ship_comparison(summaries)
-                    
-                except Exception as e:
-                    st.error(f"Failed to load dashboard data: {str(e)}")
+
+        # Toggle for filtering method
+        filter_option = st.radio("Filter data by:", ("Date Range", "Ship"))
+
+        if filter_option == "Date Range":
+            # Date range selection
+            col1, col2 = st.columns(2)
+            with col1:
+                date_from = st.date_input("From Date")
+            with col2:
+                date_to = st.date_input("To Date")
+
+            if st.button("Load Dashboard Data"):
+                with st.spinner("Loading dashboard data..."):
+                    try:
+                        # Get rating summaries for the selected date range
+                        summaries = client.get_rating_summary(
+                            from_date=date_from.isoformat(),
+                            to_date=date_to.isoformat(),
+                            filter_by="date"
+                        )
+                        
+                        # Display the dashboard components
+                        display_overview_metrics(summaries)
+                        display_metric_trends(summaries)
+                        display_ship_comparison(summaries)
+
+                    except Exception as e:
+                        st.error(f"Failed to load dashboard data: {str(e)}")
+
+        elif filter_option == "Ship":
+            # Ship selection
+            selected_ships = display_ship_selector(multi=True)
+
+            if not selected_ships:
+                st.warning("Please select at least one ship")
+                return
+
+            if st.button("Load Dashboard Data"):
+                with st.spinner("Loading dashboard data..."):
+                    try:
+                        # Convert to SailingIdentifiers (assuming sailing number 1 for dashboard)
+                        sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
+
+                        # Get rating summaries for selected ships
+                        # summaries = client.get_rating_summary_by_ship(sailings=sailings)
+                        summaries = client.get_rating_summary(
+                            sailings=sailings,
+                            filter_by="sailing"
+                        )
+
+                        # Display the dashboard components
+                        display_overview_metrics(summaries)
+                        display_metric_trends(summaries)
+                        display_ship_comparison(summaries)
+
+                    except Exception as e:
+                        st.error(f"Failed to load dashboard data: {str(e)}")
 
 def display_overview_metrics(summaries: List[Dict]):
     """Display key metrics in columns"""

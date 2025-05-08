@@ -89,70 +89,48 @@ class APIClient:
 
     def get_rating_summary(
         self,
-        sailings: List[SailingIdentifier],
+        sailings: Optional[List[SailingIdentifier]] = None,
         from_date: Optional[str] = None,
-        to_date: Optional[str] = None
+        to_date: Optional[str] = None,
+        filter_by: str = "sailing"
     ) -> List[Dict[str, Any]]:
         """
-        Get rating summaries for multiple sailings
-        
+        Get rating summaries for multiple sailings or a date range
+
         Args:
             sailings: List of sailing identifiers (ship_name + sailing_number)
             from_date: Optional start date filter (YYYY-MM-DD)
             to_date: Optional end date filter (YYYY-MM-DD)
-            
+            filter_by: Specify whether to filter by "sailing" or "date"
+
         Returns:
             List of rating summaries in the format matching the 'data' structure provided
         """
         endpoint = self.config["api"]["endpoints"]["get_ratings"]
-        
+
         # Prepare request payload
-        payload = {
-            "sailings": [{"shipName": s.ship_name, "sailingNumber": s.sailing_number} for s in sailings],
-            "filters": {}
-        }
-        
-        if from_date:
+        payload = {"filters": {}}
+
+        if filter_by == "sailing":
+            if not sailings:
+                raise ValueError("Sailings must be provided when filtering by sailing")
+            payload["sailings"] = [
+                {"shipName": s.ship_name, "sailingNumber": s.sailing_number} for s in sailings
+            ]
+        elif filter_by == "date":
+            if not from_date or not to_date:
+                raise ValueError("Both from_date and to_date must be provided when filtering by date")
             payload["filters"]["fromDate"] = from_date
-        if to_date:
             payload["filters"]["toDate"] = to_date
-            
+        else:
+            raise ValueError("Invalid filter_by value. Must be 'sailing' or 'date'")
+
         try:
             response = self._make_request("POST", endpoint, data=payload)
-            # print(response.get("data"))
-            return response.get("data")
-            # return self._map_rating_summary(response)
+            return response.get("data", [])
         except Exception as e:
             raise Exception(f"Failed to get rating summary: {str(e)}")
         
-# unused
-    # def _map_rating_summary(self, raw_data: Dict) -> List[Dict[str, Any]]:
-    #     """
-    #     Map rating summary API response using global METRIC_ATTRIBUTES
-    #     """
-    #     if not isinstance(raw_data.get("data"), list):
-    #         raise ValueError("Unexpected API response format: missing 'data' list")
-        
-    #     mapped_data = []
-        
-    #     for item in raw_data["data"]:
-    #         # Start with mandatory fields
-    #         mapped_item = {
-    #             "Sailing Number": item.get("sailingNumber"),
-    #             "Ship Name": item.get("shipName")
-    #         }
-            
-    #         # Add all metrics from our global set
-    #         for attr in self.metric_attributes:
-    #             api_field_name = self._attribute_to_api_field(attr)
-    #             mapped_item[attr] = item.get(api_field_name)
-            
-    #         # Clean None values
-    #         mapped_item = {k: v for k, v in mapped_item.items() if v is not None}
-    #         mapped_data.append(mapped_item)
-            
-    #     return mapped_data
-
     def get_metric_rating(
         self,
         sailings: List[SailingIdentifier],
@@ -205,52 +183,6 @@ class APIClient:
             return self._check_metric_response(response)
         except Exception as e:
             raise Exception(f"Failed to get metric ratings: {str(e)}")
-
-# unused
-    # def _map_metric_rating(
-    #     self,
-    #     raw_data: Dict,
-    #     metric_attribute: str,
-    #     filter_value: Optional[float] = None
-    # ) -> List[Tuple[str, str, str, List[str]]]:
-    #     """
-    #     Map API response to include filtered reviews
-        
-    #     Returns:
-    #         List of tuples:
-    #         (ship_name, sailing_number, metric_value, [filtered_review_excerpts])
-    #     """
-    #     if not isinstance(raw_data.get("data"), list):
-    #         raise ValueError("Unexpected API response format")
-        
-    #     mapped_data = []
-        
-    #     for item in raw_data["data"]:
-    #         try:
-    #             ship = str(item["shipName"])
-    #             sailing = str(item["sailingNumber"])
-    #             value = float(item["metrics"].get(metric_attribute, 0))
-                
-    #             # Get all reviews where this metric is below filter threshold
-    #             filtered_reviews = []
-    #             if filter_value is not None and value < filter_value:
-    #                 reviews = item.get("reviews", [])
-    #                 for review in reviews:
-    #                     if isinstance(review, str):
-    #                         filtered_reviews.append(review[:500])  # Return first 500 chars
-    #                     elif isinstance(review, dict):
-    #                         filtered_reviews.append(review.get("text", "")[:500])
-                
-    #             mapped_data.append((
-    #                 ship,
-    #                 sailing,
-    #                 str(value),
-    #                 filtered_reviews
-    #             ))
-    #         except (KeyError, ValueError) as e:
-    #             continue
-        
-    #     return mapped_data
     
     def get_metric_comparison(
         self,
@@ -391,7 +323,7 @@ if __name__ == "__main__":
     try:
         # Get full rating summaries
         # print("Getting rating summaries...")
-        summaries = client.get_rating_summary(sailings)
+        summaries = client.get_rating_summary(sailings=sailings)
         print(f"Got {len(summaries)} rating summaries")
         # print(summaries)
         print(json.dumps(summaries, indent=2))
