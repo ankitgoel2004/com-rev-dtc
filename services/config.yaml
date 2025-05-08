@@ -6,13 +6,18 @@ app:
   metric_categories:
     Ship Experience: ["Overall Holiday", "Value for Money", "Ship Condition/Cleanliness (Public Areas)"]
     Cabins: ["Cabins", "Cabin Cleanliness"]
-    Food & Beverage: ['F&B Quality', 'F&B Service', 'Bar Service', 'Drinks Offerings and Menu']
+    Food & Beverage: ["F&B Quality", "F&B Service", "Bar Service", "Drinks Offerings and Menu"]
     Services: ["Crew Friendliness", "Prior Customer Service", "Sentiment Analysis"]
     Activities: ["Entertainment", "Excursions"]
     Other Metrics: ["App Booking", "Flight", "Pre-Cruise Hotel Accomodation", "Embarkation/Disembarkation"]
 
 metrics:
-  attributes: ['Overall Holiday', 'Prior Customer Service', 'Flight', 'Embarkation/Disembarkation', 'Value for Money', 'App Booking', 'Pre-Cruise Hotel Accomodation', 'Cabins', 'Cabin Cleanliness', 'F&B Quality', 'F&B Service', 'Bar Service', 'Drinks Offerings and Menu', 'Entertainment', 'Excursions', 'Crew Friendliness', 'Ship Condition/Cleanliness (Public Areas)', 'Sentiment Score']
+  attributes: ["Overall Holiday", "Prior Customer Service", "Flight", 
+    "Embarkation/Disembarkation", "Value for Money", "App Booking", 
+    "Pre-Cruise Hotel Accomodation", "Cabins", "Cabin Cleanliness", 
+    "F&B Quality", "F&B Service", "Bar Service", "Drinks Offerings and Menu", 
+    "Entertainment", "Excursions", "Crew Friendliness", 
+    "Ship Condition/Cleanliness (Public Areas)", "Sentiment Score"]
 
 api:
   base_url: "http://13.126.187.166:5000/sailing"
