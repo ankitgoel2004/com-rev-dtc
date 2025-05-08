@@ -49,7 +49,7 @@ def show():
                 except Exception as e:
                     st.error(f"Failed to load dashboard data: {str(e)}")
 
-def display_overview_metrics_old(summaries: List[Dict]):
+def display_overview_metrics(summaries: List[Dict]):
     """Display key metrics in columns"""
     st.markdown("### Key Metrics")
     
@@ -59,16 +59,16 @@ def display_overview_metrics_old(summaries: List[Dict]):
     
     # Calculate averages across all selected sailings
     metrics = [
-        ('F&B Quality Overall', 'F&B Quality Overall'),
-        ('cabin cleanliness', 'cabinCleanlinessScore'),
-        ('crew friendliness', 'crewFriendlinessScore'),
-        ('Entertainment', 'entertainmentScore')
+        ('F&B Quality', 'F&B Quality'),
+        ('Cabin Cleanliness', 'Cabin Cleanliness'),
+        ('Crew Friendliness', 'Crew Friendliness'),
+        ('Entertainment', 'Entertainment')
     ]
     
     cols = st.columns(len(metrics))
     for idx, (display_name, api_name) in enumerate(metrics):
         with cols[idx]:
-            values = [s.get(display_name.lower(), 0) for s in summaries if display_name.lower() in {k.lower() for k in s}]
+            values = [s.get(display_name, 0) for s in summaries if display_name in s]
             avg = sum(values) / len(values) if values else 0
             delta = avg - 8.0  # Compare to benchmark of 8.0
             st.metric(
@@ -76,37 +76,6 @@ def display_overview_metrics_old(summaries: List[Dict]):
                 value=f"{avg:.1f}",
                 delta=f"{delta:+.1f} vs benchmark"
             )
-
-def display_overview_metrics(summaries: List[Dict]):
-    """Display key metrics in columns"""
-    st.markdown("### Key Metrics")
-
-    if not summaries:
-        st.warning("No data available for the selected criteria")
-        return
-
-    # Calculate averages across all selected sailings
-    metrics = [
-        ('F&B quality overall', 'F&B quality overall'),
-        ('cabin cleanliness', 'cabinCleanlinessScore'),
-        ('crew friendliness', 'crewFriendlinessScore'),
-        ('Entertainment', 'entertainmentScore')
-    ]
-
-    cols = st.columns(len(metrics))
-    for idx, (display_name, api_name) in enumerate(metrics):
-        with cols[idx]:
-            values = [s.get(display_name) for s in summaries if display_name in s]
-            # Filter out None values
-            valid_values = [v for v in values if v is not None]
-            avg = sum(valid_values) / len(valid_values) if valid_values else 0
-            delta = avg - 8.0
-            st.metric(
-                label=display_name,
-                value=f"{avg:.1f}",
-                delta=f"{delta:+.1f} vs benchmark"
-            )
-
 
 def display_metric_trends(summaries: List[Dict]):
     """Display metric trends over time"""
@@ -117,9 +86,9 @@ def display_metric_trends(summaries: List[Dict]):
     
     # Prepare data for plotting
     metrics = [
-        ('F&B Quality', 'fbQualityOverall'),
-        ('Cabin Cleanliness', 'cabinCleanlinessScore'),
-        ('Entertainment', 'entertainmentScore')
+        ('F&B Quality', 'F&B Quality'),
+        ('Cabin Cleanliness', 'Cabin Cleanliness'),
+        ('Entertainment', 'Entertainment')
     ]
     
     plot_data = []
@@ -127,7 +96,7 @@ def display_metric_trends(summaries: List[Dict]):
         for display_name, api_name in metrics:
             if display_name in summary:
                 plot_data.append({
-                    'Date': summary.get('sailingDate', 'N/A'),
+                    'Date': summary.get('sailingDate', '2023-01-01'),
                     'Ship': summary.get('Ship Name', 'Unknown'),
                     'Metric': display_name,
                     'Score': summary[display_name]
@@ -163,13 +132,13 @@ def display_ship_comparison(summaries: List[Dict]):
     comparison_metrics = st.multiselect(
         "Select metrics to compare",
         options=[
-            'F&B Quality Overall',
+            'F&B Quality',
             'Cabin Cleanliness',
             'Crew Friendliness',
             'Entertainment',
             'Excursions'
         ],
-        default=['F&B Quality Overall',
+        default=['F&B Quality',
             'Cabin Cleanliness',
             'Crew Friendliness',
             'Entertainment',
@@ -182,7 +151,7 @@ def display_ship_comparison(summaries: List[Dict]):
     # Prepare data for radar chart
     radar_data = []
     metric_mapping = {
-        'F&B Quality Overall': 'F&B Quality Overall',
+        'F&B Quality': 'F&B Quality',
         'Cabin Cleanliness': 'Cabin Cleanliness',
         'Crew Friendliness': 'Crew Friendliness',
         'Entertainment': 'Entertainment',
