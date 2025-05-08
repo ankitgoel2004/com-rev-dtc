@@ -80,42 +80,46 @@ def display_overview_metrics(summaries: List[Dict]):
 def display_metric_trends(summaries: List[Dict]):
     """Display metric trends over time"""
     st.markdown("### Metric Trends Over Time")
-    
+
     if not summaries:
         return
-    
+
     # Prepare data for plotting
     metrics = [
         ('F&B Quality', 'F&B Quality'),
         ('Cabin Cleanliness', 'Cabin Cleanliness'),
         ('Entertainment', 'Entertainment')
     ]
-    
+
     plot_data = []
     for summary in summaries:
         for display_name, api_name in metrics:
             if display_name in summary:
                 plot_data.append({
-                    'Date': summary.get('sailingDate', '2023-01-01'),
-                    'Ship': summary.get('Ship Name', 'Unknown'),
+                    'Date': summary.get('sailingDate', summary['End']),
+                    'Ship': summary.get('Ship', summary['Ship']),
                     'Metric': display_name,
                     'Score': summary[display_name]
                 })
-    
+
     if not plot_data:
         st.warning("No trend data available")
         return
-    
+
     df = pd.DataFrame(plot_data)
-    
+
+    # Ensure Date column is in datetime format and sort by Date
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df.sort_values(by='Date')
+
     # Create interactive plot
     fig = px.line(
         df,
         x='Date',
         y='Score',
-        color='Ship',
-        line_dash='Metric',
-        title='Metric Trends by Ship',
+        color='Metric',  # Vary color by metric
+        line_dash='Ship',
+        title='Metric Trends by Metric',
         markers=True
     )
     fig.update_layout(height=400)

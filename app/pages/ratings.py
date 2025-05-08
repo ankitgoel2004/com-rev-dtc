@@ -48,6 +48,17 @@ def display_ratings(client, data: List[Dict]):
     
     # Convert to DataFrame for easier manipulation
     df = pd.DataFrame(data)
+
+    # Sort the data by the 'Start' column
+    df['Start'] = pd.to_datetime(df['Start'])
+    df = df.sort_values(by='Start')
+
+    # Update the get_color_palette function to assign colors based on 'Ship'
+    def get_color_palette_by_ship(ships):
+        """Return a color for each ship based on its name"""
+        unique_ships = sorted(ships.unique())
+        color_map = {ship: app_config["color_palette"][i % len(app_config["color_palette"])] for i, ship in enumerate(unique_ships)}
+        return ships.map(color_map)
     
     # Display raw data toggle
     # if st.checkbox("Show raw data"):
@@ -79,10 +90,10 @@ def display_ratings(client, data: List[Dict]):
                             fig, ax = plt.subplots(figsize=(6, 4))
                             
                             # Get colors for bars
-                            colors = get_color_palette(len(df))
+                            colors = get_color_palette_by_ship(df['Ship'])
                             
                             # Create bar plot
-                            x_values = df["Ship Name"]
+                            x_values = df['Ship Name']
                             y_values = df[metric]
                             bars = ax.bar(
                                 x_values,
@@ -128,8 +139,11 @@ def display_ratings(client, data: List[Dict]):
     # Display comparison summary
     st.subheader("Comparison Summary")
     
-    # Calculate overall averages
-    summary_df = df[metric_columns].mean().to_frame(name="Average Rating").reset_index()
+    # Exclude non-numeric columns from the calculation
+    numeric_columns = df.select_dtypes(include=['number']).columns
+
+    # Calculate overall averages using only numeric columns
+    summary_df = df[numeric_columns].mean().to_frame(name="Average Rating").reset_index()
     summary_df.columns = ["Metric", "Average Rating"]
     
     # Display as a table with color coding
