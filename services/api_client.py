@@ -109,7 +109,7 @@ class APIClient:
         endpoint = self.config["api"]["endpoints"]["get_ratings"]
 
         # Prepare request payload
-        payload = {"filters": {}}
+        payload = {"filters": {}, "filter_by":filter_by}
 
         if filter_by == "sailing":
             if not sailings:
@@ -133,10 +133,13 @@ class APIClient:
         
     def get_metric_rating(
         self,
-        sailings: List[SailingIdentifier],
         metric: str,
+        sailings: Optional[List[SailingIdentifier]] = None,
+        from_date: Optional[str] = None,
+        to_date: Optional[str] = None,
         filter_below: Optional[float] = None,
-        compare_to_average: bool = False
+        compare_to_average: bool = False,
+        filter_by:str = "sailing"
     ) -> Dict:
         """
         Get and compare metric ratings across multiple sailings
@@ -174,8 +177,23 @@ class APIClient:
             "sailings": [{"shipName": s.ship_name, "sailingNumber": s.sailing_number} for s in sailings],
             "metric": metric,
             "filterBelow": filter_below,
-            "compareToAverage": compare_to_average
+            "compareToAverage": compare_to_average,
+            "filter_by":filter_by
         }
+
+        if filter_by == "sailing":
+            if not sailings:
+                raise ValueError("Sailings must be provided when filtering by sailing")
+            payload["sailings"] = [
+                {"shipName": s.ship_name, "sailingNumber": s.sailing_number} for s in sailings
+            ]
+        elif filter_by == "date":
+            if not from_date or not to_date:
+                raise ValueError("Both from_date and to_date must be provided when filtering by date")
+            payload["filters"]["fromDate"] = from_date
+            payload["filters"]["toDate"] = to_date
+        else:
+            raise ValueError("Invalid filter_by value. Must be 'sailing' or 'date'")
         
         try:
             response = self._make_request("POST", endpoint, data=payload)
@@ -186,9 +204,12 @@ class APIClient:
     
     def get_metric_comparison(
         self,
-        sailings: List[SailingIdentifier],
         metrics: List[str],
-        filter_below: Optional[float] = None
+        filter_below: Optional[float] = None,
+        sailings: Optional[List[SailingIdentifier]] = None,
+        from_date: Optional[str] = None,
+        to_date: Optional[str] = None,
+        filter_by:str = "sailing"
     ) -> Dict:
         """
         Compare multiple metrics across sailings
@@ -218,12 +239,23 @@ class APIClient:
         
         for metric in metrics:
             try:
-                result = self.get_metric_rating(
-                    sailings=sailings,
-                    metric=metric,
-                    filter_below=filter_below,
-                    compare_to_average=True
-                )
+                if filter_by == "sailing":
+                    result = self.get_metric_rating(
+                        metric=metric,
+                        sailings=sailings,
+                        filter_below=filter_below,
+                        compare_to_average=True,
+                        filter_by=filter_by
+                    )
+                elif filter_by == "date":
+                    result = self.get_metric_rating(
+                        metric=metric,
+                        from_date=from_date,
+                        to_date=to_date,
+                        filter_below=filter_below,
+                        compare_to_average=True,
+                        filter_by=filter_by
+                    )
                 comparisons.append(result)
             except Exception as e:
                 comparisons.append({

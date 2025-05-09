@@ -119,14 +119,11 @@ def get_rating_summary():
     elif filter_by == "date":
         # Apply date filters if provided
         if "filters" in data:
-            from_date = data["filters"].get("fromDate")
-            to_date = data["filters"].get("toDate")
+            from_date = pd.to_datetime(data["filters"].get("fromDate"))
+            to_date = pd.to_datetime(data["filters"].get("toDate"))
 
             if not from_date or not to_date:
                 return jsonify({"error": "Both fromDate and toDate must be provided when filtering by date"}), 400
-
-            from_date = pd.to_datetime(from_date)
-            to_date = pd.to_datetime(to_date)
 
             # Filter SAMPLE_DATA by date range
             results = [

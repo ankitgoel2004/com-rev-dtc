@@ -8,7 +8,6 @@ import pandas as pd
 from scipy.stats import linregress
 
 
-
 def add_trendline(ax, x_values, y_values, color="red"):
     """Add a trendline to the plot"""
     if len(x_values) > 1:
@@ -19,24 +18,66 @@ def add_trendline(ax, x_values, y_values, color="red"):
                 label=f"Trend (slope: {slope:.2f})")
         ax.legend(loc='upper right')
 
+
 def show():
-    st.title("📊 Ratings Summary")
+    st.title("📈 Ratings Summary")
+
+    # Initialize API client
     client = get_client()
-    
+
     with st.container():
-        selected_ships = display_ship_selector(multi=True)
-        
-        if not selected_ships:
-            return
-            
-        if st.button("Generate Report"):
-            # with st.spinner("Loading data..."):
-            try:
-                sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
-                data = client.get_rating_summary(sailings)
-                display_ratings(client,data)
-            except Exception as e:
-                st.error(f"Failed to load ratings: {str(e)}")
+        st.markdown("### Filter Ratings")
+
+        # Toggle for filtering method
+        filter_option = st.radio("Filter data by:", ("Date Range", "Ship"))
+
+        if filter_option == "Date Range":
+            # Date range selection
+            col1, col2 = st.columns(2)
+            with col1:
+                date_from = st.date_input("From Date")
+            with col2:
+                date_to = st.date_input("To Date")
+
+            if st.button("Load Ratings Data"):
+                with st.spinner("Loading ratings data..."):
+                    try:
+                        # Fetch ratings data for the selected date range
+                        ratings_data = client.get_rating_summary(
+                            from_date=date_from.isoformat(),
+                            to_date=date_to.isoformat(),
+                            filter_by="date"
+                        )
+
+                        # Display the ratings summary
+                        display_ratings(client, ratings_data)
+
+                    except Exception as e:
+                        st.error(f"Failed to load ratings data: {str(e)}")
+
+        elif filter_option == "Ship":
+            # Ship selection
+            selected_ships = display_ship_selector(multi=True)
+
+            if not selected_ships:
+                st.warning("Please select at least one ship")
+                return
+
+            if st.button("Load Ratings Data"):
+                with st.spinner("Loading ratings data..."):
+                    try:
+                        # Fetch ratings data for selected ships
+                        ratings_data = client.get_rating_summary(
+                            ships=selected_ships,
+                            filter_by="ship"
+                        )
+
+                        # Display the ratings summary
+                        display_ratings(client, ratings_data)
+
+                    except Exception as e:
+                        st.error(f"Failed to load ratings data: {str(e)}")
+
 
 def display_ratings(client, data: List[Dict]):
     # Implementation of ratings visualization
