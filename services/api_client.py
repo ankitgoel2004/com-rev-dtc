@@ -174,11 +174,11 @@ class APIClient:
             raise ValueError(f"Invalid metric attribute. Must be one of: {self.get_valid_metrics}")
         
         payload = {
-            "sailings": [{"shipName": s.ship_name, "sailingNumber": s.sailing_number} for s in sailings],
             "metric": metric,
             "filterBelow": filter_below,
             "compareToAverage": compare_to_average,
-            "filter_by":filter_by
+            "filter_by":filter_by,
+            "filters": {}
         }
 
         if filter_by == "sailing":
@@ -190,14 +190,15 @@ class APIClient:
         elif filter_by == "date":
             if not from_date or not to_date:
                 raise ValueError("Both from_date and to_date must be provided when filtering by date")
+            # payload = {"filters": {}}
             payload["filters"]["fromDate"] = from_date
             payload["filters"]["toDate"] = to_date
         else:
             raise ValueError("Invalid filter_by value. Must be 'sailing' or 'date'")
-        
+
         try:
             response = self._make_request("POST", endpoint, data=payload)
-            # print(response)
+            # print(response["results"])
             return self._check_metric_response(response)
         except Exception as e:
             raise Exception(f"Failed to get metric ratings: {str(e)}")

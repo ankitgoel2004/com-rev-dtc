@@ -8,6 +8,8 @@ import pandas as pd
 
 def show():
     st.title("📈 Metric Comparison")
+
+    client = get_client()
     
     with st.container():
         col1, col2 = st.columns(2)
@@ -38,7 +40,6 @@ def show():
             if st.button("Load Metric Data"):
                 with st.spinner("Loading metric data..."):
                     try:
-                        client = get_client()
                         results = client.get_metric_rating(
                             from_date=date_from.isoformat(),
                             to_date=date_to.isoformat(),
@@ -61,7 +62,6 @@ def show():
             if st.button("Load Metric Data"):
                 with st.spinner("Loading metric data..."):
                     try:
-                        client = get_client()
                         sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
                         results = client.get_metric_rating(
                             sailings=sailings,

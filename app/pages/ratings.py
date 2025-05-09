@@ -43,14 +43,14 @@ def show():
                 with st.spinner("Loading ratings data..."):
                     try:
                         # Fetch ratings data for the selected date range
-                        ratings_data = client.get_rating_summary(
+                        summaries = client.get_rating_summary(
                             from_date=date_from.isoformat(),
                             to_date=date_to.isoformat(),
                             filter_by="date"
                         )
 
                         # Display the ratings summary
-                        display_ratings(client, ratings_data)
+                        display_ratings(client, summaries)
 
                     except Exception as e:
                         st.error(f"Failed to load ratings data: {str(e)}")
@@ -66,14 +66,18 @@ def show():
             if st.button("Load Ratings Data"):
                 with st.spinner("Loading ratings data..."):
                     try:
-                        # Fetch ratings data for selected ships
-                        ratings_data = client.get_rating_summary(
-                            ships=selected_ships,
-                            filter_by="ship"
+                        # Convert to SailingIdentifiers (assuming sailing number 1 for dashboard)
+                        sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
+
+                        # Get rating summaries for selected ships
+                        # summaries = client.get_rating_summary_by_ship(sailings=sailings)
+                        summaries = client.get_rating_summary(
+                            sailings=sailings,
+                            filter_by="sailing"
                         )
 
                         # Display the ratings summary
-                        display_ratings(client, ratings_data)
+                        display_ratings(client, summaries)
 
                     except Exception as e:
                         st.error(f"Failed to load ratings data: {str(e)}")
