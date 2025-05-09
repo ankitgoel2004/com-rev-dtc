@@ -24,25 +24,54 @@ def show():
                 step=0.5
             )
         
-        selected_ships = display_ship_selector(multi=True)
-        
-        if not metric or not selected_ships:
-            return
-            
-        if st.button("Compare Metrics"):
-            with st.spinner("Analyzing..."):
-                try:
-                    client = get_client()
-                    sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
-                    results = client.get_metric_rating(
-                        sailings=sailings,
-                        metric=metric,
-                        filter_below=threshold,
-                        compare_to_average=False
-                    )
-                    display_comparison(results, metric, threshold)
-                except Exception as e:
-                    st.error(f"Comparison failed: {str(e)}")
+        # Add filter option for Ship or Date Range
+        filter_option = st.radio("Filter data by:", ("Date Range", "Ship"))
+
+        if filter_option == "Date Range":
+            # Date range selection
+            col1, col2 = st.columns(2)
+            with col1:
+                date_from = st.date_input("From Date")
+            with col2:
+                date_to = st.date_input("To Date")
+
+            if st.button("Load Metric Data"):
+                with st.spinner("Loading metric data..."):
+                    try:
+                        client = get_client()
+                        results = client.get_metric_rating(
+                            from_date=date_from.isoformat(),
+                            to_date=date_to.isoformat(),
+                            metric=metric,
+                            filter_below=threshold,
+                            filter_by="date"
+                        )
+                        display_comparison(results, metric, threshold)
+                    except Exception as e:
+                        st.error(f"Failed to load metric data: {str(e)}")
+
+        elif filter_option == "Ship":
+            # Ship selection
+            selected_ships = display_ship_selector(multi=True)
+
+            if not selected_ships:
+                st.warning("Please select at least one ship")
+                return
+
+            if st.button("Load Metric Data"):
+                with st.spinner("Loading metric data..."):
+                    try:
+                        client = get_client()
+                        sailings = [SailingIdentifier(ship, "1") for ship in selected_ships]
+                        results = client.get_metric_rating(
+                            sailings=sailings,
+                            metric=metric,
+                            filter_below=threshold,
+                            filter_by="sailing"
+                        )
+                        display_comparison(results, metric, threshold)
+                    except Exception as e:
+                        st.error(f"Failed to load metric data: {str(e)}")
 
         
 
