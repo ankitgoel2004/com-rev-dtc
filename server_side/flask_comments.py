@@ -70,7 +70,44 @@ def find_sailings(sailings: List[Dict]) -> List[Dict]:
         )
         if found:
             results.append(found)
-    # sorted_data = sorted(results, key=lambda x: x["End"])
+    return results
+
+def filter_sailings(data):
+    filter_by = data.get("filter_by", "sailing")
+    print("in filter_sailings")
+
+    results = []
+
+    if filter_by == "sailing":
+        # Get requested sailings if provided
+        if "sailings" in data:
+            results = find_sailings(data["sailings"])
+        else:
+            return -1
+
+    elif filter_by == "date":
+        # Apply date filters if provided
+        if "filters" in data:
+            from_date = pd.to_datetime(data["filters"].get("fromDate"))
+            to_date = pd.to_datetime(data["filters"].get("toDate"))
+            print(from_date, to_date)
+
+            if not from_date or not to_date:
+                return -2
+
+            # Filter SAMPLE_DATA by date range
+            results = [
+                item for item in SAMPLE_DATA
+                if pd.to_datetime(item["Start"]) >= from_date and pd.to_datetime(item["End"]) <= to_date
+            ]
+        else:
+            return -3
+
+    else:
+        return -4
+
+    # Remove duplicates if both sailings and date filters are applied
+    results = {frozenset(item.items()): item for item in results}.values()
     return results
 
 # API Endpoints
@@ -100,64 +137,66 @@ def remove_server_header(response):
 def get_rating_summary():
     """Endpoint for getting full rating summaries"""
     data = request.get_json()
+    print(data)
 
     # Validate input
     if not data or ("sailings" not in data and "filters" not in data):
         return jsonify({"error": "Missing sailings or filters parameter"}), 400
-
-    filter_by = data.get("filterBy", "sailing")
-
-    results = []
-
-    if filter_by == "sailing":
-        # Get requested sailings if provided
-        if "sailings" in data:
-            results = find_sailings(data["sailings"])
-        else:
-            return jsonify({"error": "Sailings must be provided when filtering by sailing"}), 400
-
-    elif filter_by == "date":
-        # Apply date filters if provided
-        if "filters" in data:
-            from_date = pd.to_datetime(data["filters"].get("fromDate"))
-            to_date = pd.to_datetime(data["filters"].get("toDate"))
-
-            if not from_date or not to_date:
-                return jsonify({"error": "Both fromDate and toDate must be provided when filtering by date"}), 400
-
-            # Filter SAMPLE_DATA by date range
-            results = [
-                item for item in SAMPLE_DATA
-                if pd.to_datetime(item["Start"]) >= from_date and pd.to_datetime(item["End"]) <= to_date
-            ]
-        else:
-            return jsonify({"error": "Filters must be provided when filtering by date"}), 400
-
-    else:
+    
+    working_data = filter_sailings(data)
+    if working_data == -1:
+        return jsonify({"error": "Sailings must be provided when filtering by sailing"}), 400
+    if working_data == -2:
+        return jsonify({"error": "Both fromDate and toDate must be provided when filtering by date"}), 400
+    if working_data == -3:
+        return jsonify({"error": "Filters must be provided when filtering by date"}), 400
+    if working_data == -4:
         return jsonify({"error": "Invalid filterBy value. Must be 'sailing' or 'date'"}), 400
-
-    # Remove duplicates if both sailings and date filters are applied
-    results = {frozenset(item.items()): item for item in results}.values()
-
+#     working_data = is_empty_or_nan_rating(working_data)
+#     print(working_data)
     return jsonify({
         "status": "success",
-        "count": len(results),
-        "data": list(results)
+        "count": len(working_data),
+        "data": list(working_data)
     })
+
+import math  # Import the math module for isnan()
+
+def is_empty_or_nan(value):
+    """
+    Checks if a value is None, NaN, or an empty sequence.
+
+    Args:
+        value: The value to check.
+
+    Returns:
+        True if the value is None, NaN, or an empty sequence (list, tuple, string, dict), False otherwise.
+    """
+    if value is None:
+        return True
+    if isinstance(value, float) and math.isnan(value):
+        return True
+    if isinstance(value, (list, tuple, str, dict)):
+        return len(value) < 1
+    return False #added this
 
 @app.route('/sailing/getMetricRating', methods=['POST'])
 def get_metric_comparison():
     """Enhanced endpoint with metric value filtering"""
     data = request.get_json()
+#     print("data",data)
     
     # Validate input
-    if not data or "sailings" not in data or "metric" not in data:
+    if not data or "filter_by" not in data or "metric" not in data:
         return jsonify({"error": "Missing required parameters"}), 400
     
     metric = data["metric"]
-    sailings = data["sailings"]
+    # sailings = data["sailings"]
     filter_below = data.get("filterBelow")
     compare_avg = data.get("compareToAverage", False)
+    filter_by = data.get("filter_by", "sailing")
+    print(metric)
+#     metric = "F&B Quality"
 
     # Validate metric (excluding 'Review')
     if metric not in METRIC_ATTRIBUTES:
@@ -166,17 +205,27 @@ def get_metric_comparison():
             "valid_metrics": METRIC_ATTRIBUTES
         }), 400
     
+    working_data = filter_sailings(data)
+    if working_data == -1:
+        return jsonify({"error": "Sailings must be provided when filtering by sailing"}), 400
+    if working_data == -2:
+        return jsonify({"error": "Both fromDate and toDate must be provided when filtering by date"}), 400
+    if working_data == -3:
+        return jsonify({"error": "Filters must be provided when filtering by date"}), 400
+    if working_data == -4:
+        return jsonify({"error": "Invalid filterBy value. Must be 'sailing' or 'date'"}), 400
+
     # Prepare response
     results = []
     all_metric_values = []
 
-    for sailing in sailings:
+    for sailing in working_data:
         print("get metric comparison",sailing)
-        ship = sailing["shipName"]
-        number = sailing["sailingNumber"]
+        ship = sailing["Ship Name"]
+        number = sailing["Sailing Number"]
         df = get_sailing_df(ship, number)
         df_reason = get_sailing_df_reason(ship, number)
-        # print(df)
+#         print("df_reason",df_reason)
         
         if df is None or metric not in df.columns:
             results.append({
@@ -194,8 +243,14 @@ def get_metric_comparison():
         # Get filtered reviews if requested
         filtered_reviews = []
         if filter_below is not None:
-            mask = df[metric].astype(float) < filter_below
+            mask = df[metric].astype(float) <= filter_below
             filtered_reviews = df_reason.loc[mask, metric].tolist()
+#             print(filtered_reviews)
+            for i, rev in enumerate(filtered_reviews):
+                if is_empty_or_nan(rev):
+                    filtered_reviews[i] = "Please refer to the comment"
+#             print(filtered_reviews)
+#             print(len(filtered_reviews))
             filtered_metric = df.loc[mask, metric].tolist()
         
         results.append({

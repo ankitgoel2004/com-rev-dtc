@@ -3,6 +3,7 @@ import pandas as pd
 from typing import Dict
 import re
 from datetime import datetime
+import json
 
 
 summary_data = [
@@ -128,7 +129,7 @@ summary_data = [
     }
 ]
 
-summary_data2 = [
+summary_discovery2 = [
     {
         'Overall Holiday': 8.79,
         'Prior Customer Service': 8.14,
@@ -362,9 +363,292 @@ summary_data2 = [
         'Sailing Number': '1'}
     ]
 
-def filename_date(filename, year=2025):
+summary_discovery = [
+    {'Overall Holiday': 10.0,
+    'Prior Customer Service': None,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 10,
+    'Primary Issues': None,
+    'Ship Name': 'MDY-2-9Feb',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 9.0,
+    'Prior Customer Service': 6.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': 9.0,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': 10.0,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 8.0,
+    'Primary Issues': 'Unreliable wake-up calls could lead to missed excursions.; Need for improved Wi-Fi connectivity.',
+    'Ship Name': 'MDY-29Dec-5Jan',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 9.0,
+    'Prior Customer Service': None,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': 10.0,
+    'F&B Service': 10.0,
+    'Bar Service': 10.0,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': 5.0,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 9.0,
+    'Primary Issues': None,
+    'Ship Name': 'MDY-23-30Mar',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 10.0,
+    'Prior Customer Service': 10.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': 10.0,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 10,
+    'Primary Issues': None,
+    'Ship Name': 'MDY-2-9Mar',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': None,
+    'Prior Customer Service': 4.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 7.0,
+    'Primary Issues': 'Lack of proactive communication regarding flight delays.; Need for improved passenger updates during travel disruptions.',
+    'Ship Name': 'MDY-5-12Jan',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 10.0,
+    'Prior Customer Service': 10.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 10.0,
+    'Primary Issues': None,
+    'Ship Name': 'MDY-16-23Feb',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 9.0,
+    'Prior Customer Service': None,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': 9.0,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 10.0,
+    'Primary Issues': None,
+    'Ship Name': 'MDY-19-26Jan',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 8.0,
+    'Prior Customer Service': 7.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 7,
+    'Primary Issues': 'Inconsistent gluten-free meal service on flights.',
+    'Ship Name': 'MDY-12-19Jan',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 10.0,
+    'Prior Customer Service': 10.0,
+    'Flight': 10.0,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': 10.0,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': 10.0,
+    'Bar Service': 10.0,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': 10.0,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 9.0,
+    'Primary Issues': 'Spa voucher with unexpected fees',
+    'Ship Name': 'MDY-6-13April',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 9.0,
+    'Prior Customer Service': 10.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': 10.0,
+    'F&B Quality': None,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': 10.0,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 9.0,
+    'Primary Issues': None,
+    'Ship Name': 'MDY-9-16Mar',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 8.0,
+    'Prior Customer Service': 9.0,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': 9.0,
+    'Cabin Cleanliness': 10.0,
+    'F&B Quality': 6.0,
+    'F&B Service': None,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': 10.0,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 7.0,
+    'Primary Issues': 'Poor food quality; Limited breakfast options',
+    'Ship Name': 'MDY-26Jan-2Feb',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'},
+    {'Overall Holiday': 9.0,
+    'Prior Customer Service': None,
+    'Flight': None,
+    'Embarkation/Disembarkation': None,
+    'Value for Money': None,
+    'App Booking': None,
+    'Pre-Cruise Hotel Accomodation': None,
+    'Cabins': None,
+    'Cabin Cleanliness': None,
+    'F&B Quality': None,
+    'F&B Service': 3.0,
+    'Bar Service': None,
+    'Drinks Offerings and Menu': None,
+    'Entertainment': None,
+    'Excursions': None,
+    'Crew Friendliness': None,
+    'Ship Condition/Cleanliness (Public Areas)': None,
+    'Sentiment Score': 7.0,
+    'Primary Issues': 'Expensive excursions; Difficulties booking tables for large groups',
+    'Ship Name': 'MDY-23Feb-3Mar',
+    'Sailing Number': '1',
+    'Fleet': 'Marella',
+    'Ship': 'Discovery'}
+    ]
+
+
+def filename_date(filename, dNumber, year=2025):
+    if dNumber == 1:
+        match = re.match(r'MDY-(\d+[A-Za-z]*)-(\d+[A-Za-z]+)', filename)
+    else:
     # Extract all date parts using improved regex
-    match = re.match(r'MDY2-(\d+[A-Za-z]*)-(\d+[A-Za-z]+)', filename)
+        match = re.match(r'MDY2-(\d+[A-Za-z]*)-(\d+[A-Za-z]+)', filename)
     if not match:
         print(f"Filename format not recognized: {filename}")
         return None, None
@@ -410,21 +694,58 @@ def filename_date(filename, year=2025):
         print(f"Error processing {filename}: {e}")
         return None, None
 
+
+def is_empty_or_nan_rating(dfList):
+    processed_data = [] 
+    for data_dict in dfList:
+        processed_dict = data_dict.copy()  # Create a copy to avoid modifying the original
+
+        overall_holiday = processed_dict.get('Overall Holiday')  # Use .get() to handle missing key safely
+
+        if overall_holiday is not None:
+            replacement_value = overall_holiday - 1
+        else:
+            replacement_value = 6
+
+        for key, value in processed_dict.items():
+            if value is None:
+                processed_dict[key] = replacement_value
+
+        processed_data.append(processed_dict)
+
+    return processed_data
+    
 def get_summary_data():
-    for data in summary_data2:
+    for data in summary_discovery2:
         name =  data.get("Ship Name")
-        start, end = filename_date(name, year=2025)
+        start, end = filename_date(name, 2, year=2025)
         data.update({"Start":start})
         data.update({"End":end})
         data.update({"Fleet":"Marella"})
         data.update({"Ship":"Discovery 2"})
-    return summary_data2
+        print(start, end)
+    for data in summary_discovery:
+        name =  data.get("Ship Name")
+        start, end = filename_date(name,1, year=2025)
+        data.update({"Start":start})
+        data.update({"End":end})
+        # data.update({"Fleet":"Marella"})
+        # data.update({"Ship":"Discovery"})
+        print(start, end)
+    finalSummary = summary_discovery2+summary_discovery
+    finalSummary = is_empty_or_nan_rating(finalSummary)
+    with open("./smry.json", 'w') as json_file:
+        json.dump(finalSummary, json_file, indent=4) 
+    return finalSummary
+    # return summary_data2
 
-def format_filename(input_string):
+def format_filename(input_string, data_dir_index):
 #     input_string = "MDY2 2 - 9 April"
-
+    if data_dir_index == 1:
+        modified_string = re.sub(r"(MDY) ", r"\1-", input_string, 1)
     # Replace the first space after "MDY2" with "_"
-    modified_string = re.sub(r"(MDY2) ", r"\1-", input_string, 1)
+    else:
+        modified_string = re.sub(r"(MDY2) ", r"\1-", input_string, 1)
 
     # Remove all remaining spaces in the string
     final_string = modified_string.replace(" ", "")
@@ -469,7 +790,10 @@ def load_sailing_data_td1(data_dir: str = "./test_data") -> Dict[str, pd.DataFra
 
 
 
-def load_sailing_data_rate_reason(data_dir: str = "./test_data2/DISCOVERY 2 - 2025") -> Dict[str, pd.DataFrame]:
+# def load_sailing_data_rate_reason(data_dir: str = "./test_data2/DISCOVERY 2 - 2025") -> Dict[str, pd.DataFrame]:
+def load_sailing_data_rate_reason() -> Dict[str, pd.DataFrame]:
+
+
     """
     Load all sailing data CSV files from a directory into DataFrames
     
@@ -481,30 +805,33 @@ def load_sailing_data_rate_reason(data_dir: str = "./test_data2/DISCOVERY 2 - 20
     """
     sailing_data = {}
     sailing_data_reason = {}
-    
-    for subdir_name in os.listdir(data_dir):
-        subdir_path = os.path.join(data_dir, subdir_name)
-        found = False
-        if os.path.isdir(subdir_path):
-            for file in os.listdir(subdir_path):
-                if file.endswith(subdir_name+".csv"):
-                    found = True
-            if found == True:
-                concat_rating_file = os.path.join(subdir_path, f"{subdir_name}.csv")
-                concat_reason_file = os.path.join(subdir_path, f"{subdir_name}_reason.csv")
-                n = format_filename(subdir_name)
-                # print(n)
-                # print(avg_rating_file)
-                df_rating = pd.read_csv(concat_rating_file)
-                df_reason = pd.read_csv(concat_reason_file)
 
-                ship = n
-                sailing = "1"
-                key = f"{ship}_{sailing}"
-                key = key.lower()
+    data_directs = ["./test_data2/DISCOVERY 2 - 2025", "./test_data2/DISCOVERY 2025" ]
 
-                sailing_data[key] = df_rating
-                sailing_data_reason[key]= df_reason
+    for data_dir_index, data_dir in enumerate(data_directs):
+        for subdir_name in os.listdir(data_dir):
+            subdir_path = os.path.join(data_dir, subdir_name)
+            found = False
+            if os.path.isdir(subdir_path):
+                for file in os.listdir(subdir_path):
+                    if file.endswith(subdir_name+".csv"):
+                        found = True
+                if found == True:
+                    concat_rating_file = os.path.join(subdir_path, f"{subdir_name}.csv")
+                    concat_reason_file = os.path.join(subdir_path, f"{subdir_name}_reason.csv")
+                    n = format_filename(subdir_name, data_dir_index)
+                    # print(n)
+                    # print(avg_rating_file)
+                    df_rating = pd.read_csv(concat_rating_file)
+                    df_reason = pd.read_csv(concat_reason_file)
+
+                    ship = n
+                    sailing = "1"
+                    key = f"{ship}_{sailing}"
+                    key = key.lower()
+
+                    sailing_data[key] = df_rating
+                    sailing_data_reason[key]= df_reason
                 
     
     return sailing_data, sailing_data_reason
